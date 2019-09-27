@@ -23,6 +23,12 @@ entry_execute_method_root_ManagementServer() {
 		common_execute_method_param "$DMROOT.ManagementServer.ConnectionRequestUsername" "1" "$UCI_GET easycwmp.@local[0].username" "management_server_set easycwmp.@local[0].username"
 		common_execute_method_param "$DMROOT.ManagementServer.ConnectionRequestPassword" "1" "" "management_server_set easycwmp.@local[0].password"
 		common_execute_method_param "$DMROOT.ManagementServer.ParameterKey" "0" "$UCI_GET easycwmp.@acs[0].parameter_key" "" "" "1"
+		common_execute_method_param "$DMROOT.ManagementServer.STUNEnable" "1" "$UCI_GET easycwmp.@local[0].stun_enable" "management_stun_set easycwmp.@local[0].stun_enable" "xsd:boolean" ""
+		common_execute_method_param "$DMROOT.ManagementServer.STUNServerAddress" "1" "$UCI_GET easycwmp.@local[0].stun_address" "management_stun_set easycwmp.@local[0].stun_address" "" ""
+		common_execute_method_param "$DMROOT.ManagementServer.STUNServerPort" "1" "$UCI_GET easycwmp.@local[0].stun_port" "management_stun_set easycwmp.@local[0].stun_port" "xsd:unsignedInt" ""
+		common_execute_method_param "$DMROOT.ManagementServer.STUNUsername" "1" "$UCI_GET easycwmp.@local[0].stun_username" "management_stun_set easycwmp.@local[0].stun_username" "" ""
+		common_execute_method_param "$DMROOT.ManagementServer.STUNPassword" "1" "$UCI_GET easycwmp.@local[0].stun_password" "management_stun_set easycwmp.@local[0].stun_password" "" ""
+		common_execute_method_param "$DMROOT.ManagementServer.NATDetected" "0" "management_stun_get natdetected" "" "xsd:boolean" ""
 		return 0;
 		;;
 	esac
@@ -70,3 +76,35 @@ management_server_get_connection_request_url() {
 	fi
 	echo $val
 }
+
+management_stun_set() {
+	local cfg=$1
+	local val=$2
+	$UCI_SET $cfg="$val"
+	/etc/init.d/stun-client restart
+	return 0
+}
+
+management_stun_get() {
+	local cfg=$1
+	
+	if [ "$cfg" == "ucra" ]; then
+		ucra=`cat /tmp/stun_ucra 2> /dev/null`
+		echo $ucra
+	elif [ "$cfg" == "natdetected" ]; then
+		nat=`cat /tmp/stun_natdetected 2> /dev/null`
+		if [ "$nat" != "" ]; then
+			stun_enable=`$UCI_GET easycwmp.@local[0].stun_enable`
+			if [ "$stun_enable" == "1" ]; then
+				echo $nat
+			else
+				echo "0"
+			fi
+		else
+			echo "0"
+		fi
+	else
+		echo ""
+	fi
+}
+

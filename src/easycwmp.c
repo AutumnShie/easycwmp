@@ -324,6 +324,8 @@ int main (int argc, char **argv)
 
 	if (ubus_init()) D("ubus initialization failed\n");
 
+	system ( "env -i ACTION=ready /sbin/hotplug-call cwmp" );
+
 	http_server_init();
 
 	pid_t pid, sid;
@@ -374,6 +376,7 @@ int main (int argc, char **argv)
 	free(cwmp);
 
 	log_message(NAME, L_NOTICE, "exiting\n");
+	system ( "env -i ACTION=exit /sbin/hotplug-call cwmp" );
 	return 0;
 }
 

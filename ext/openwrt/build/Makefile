@@ -82,6 +82,7 @@ define Package/easycwmp/install
 	$(INSTALL_CONF) $(PKG_BUILD_DIR)/ext/openwrt/config/easycwmp $(1)/etc/config
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ext/openwrt/init.d/easycwmpd $(1)/etc/init.d
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/cwmp/
 ifeq ($(EASYCWMP_BACKUP_DATA_FILE),y)
 	$(INSTALL_DIR) $(1)/etc/easycwmp
 endif
